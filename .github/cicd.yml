@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [martynova]
+    branches: [main]
   pull_request:
-    branches: [martynova]
+    branches: [main]
 
 permissions:
  contents: read
@@ -36,7 +36,7 @@ jobs:
 
     - name: Test with pytest
       run: |
-        export PYTHONPATH=pet_preform_inspector
+        export PYTHONPATH=pet_preform_detection
         pytest
 
     - name: Build release distributions
@@ -54,7 +54,7 @@ jobs:
     deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/martynova'
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Deploy to production
