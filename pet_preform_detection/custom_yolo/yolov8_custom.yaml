@@ -1,0 +1,6 @@
+#path: ./content/drive/MyDrive/custom_yolo/runs
+train: ./data/train/images
+val: ./data/test/images
+
+nc: 1 # Количество классов
+names: ['preform'] # Названия классов
