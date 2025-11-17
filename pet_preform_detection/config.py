@@ -20,3 +20,4 @@ OFFSET_CONTOUR=10
 #путь для сохранения картинок
 PATCH_IMAGE_SAVE="images/box/"
 
+
