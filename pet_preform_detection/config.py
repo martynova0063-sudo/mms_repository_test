@@ -7,6 +7,7 @@ CONFIDENCE_THRESHOLD = 0.5
 #размер фрейма
 INPUT_WIDTH = 640
 INPUT_HEIGHT = 352
+
 #путь к видеофайлу
 PATH_VIDEO = 'video/track001.mp4'
 
