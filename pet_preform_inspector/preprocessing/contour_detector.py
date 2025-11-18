@@ -17,6 +17,15 @@ from config import (
 )
 from utils import save_debug_image
 
+def _binarize_otsu():
+    1==1
+
+def _binarize_background_subtraction_canny():
+    1==1  
+
+def _binarize_distance_transform(): 
+    1==1
+
 
 def is_elongated_contour(contour, min_aspect_ratio=2.0):
     """
