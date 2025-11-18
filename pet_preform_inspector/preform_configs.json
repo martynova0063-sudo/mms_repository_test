@@ -1,0 +1,24 @@
+{
+  "preform_types": {
+    "type_A": {
+      "name": "Стандартная преформа A",
+      "dimensions": {
+        "length": {"nominal": 142.0, "tolerance": 0.50},
+        "width": {"nominal": 42.00, "tolerance": 0.30},
+        "neck_diameter": {"nominal": 33.4, "tolerance": 0.12},
+        "bottom_diameter": {"nominal": 38.34, "tolerance": 0.27},
+        "max_deviation": {"nominal": 0.0, "tolerance": 0.8}
+      }
+    },
+    "type_B": {
+      "name": "Преформа B (Пример)",
+      "dimensions": {
+        "length": {"nominal": 138.0, "tolerance": 0.70},
+        "width": {"nominal": 33.00, "tolerance": 0.15},
+        "neck_diameter": {"nominal": 21.74, "tolerance": 0.13},
+        "bottom_diameter": {"nominal": 26.04, "tolerance": 0.27},
+        "max_deviation": {"nominal": 0.0, "tolerance": 1.0}
+      }
+    }
+  }
+}

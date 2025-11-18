@@ -1,0 +1,6 @@
+<View>
+  <View style="display:flex;align-items:start;gap:8px;flex-direction:column"><Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="true"/><RectangleLabels name="label" toName="image" showInline="true">
+    <Label value="Black Speck" background="red"/>
+  </RectangleLabels></View>
+  
+</View>
