@@ -1,6 +1,9 @@
 # measurement/measuring_size.py
 
+from typing import Dict, Any
 import numpy as np
+from utils import scale_to_mm
+from loguru import logger
 from utils import scale_to_mm
 from loguru import logger
 
@@ -162,4 +165,80 @@ def measure_bottom_diameter(aligned_contour, pixels_per_mm=None, orientation="ne
         d1_mm_val = d1_px
 
     logger.debug(f"d1 = {d1_mm_val:.2f} мм (ориентация: {orientation})")
+    return result
+
+
+def measure_straightness_deviation(
+    aligned_contour: np.ndarray,
+    pixels_per_mm: float = 1.0,
+    neck_percentage: float = 0.15
+) -> Dict[str, Any]:
+    """
+    Измеряет:
+    - S_max — максимальное отклонение оси от прямой,
+    - S_rms — среднеквадратичное отклонение (RMS).
+    Исключает горлышко (последние neck_percentage длины).
+    """
+    if aligned_contour.size == 0:
+        raise ValueError("Контур пустой.")
+
+    points = aligned_contour.reshape(-1, 2).astype(np.float32)
+    x_coords = points[:, 0]
+    y_coords = points[:, 1]
+
+    min_x = np.min(x_coords)
+    max_x = np.max(x_coords)
+    L_px = max_x - min_x
+
+    # Исключаем горлышко
+    neck_start_x = max_x - neck_percentage * L_px
+
+    num_slices = max(5, int((neck_start_x - min_x) / 15))   # 15 ширина сегмента
+    step = (neck_start_x - min_x) / num_slices
+
+    slice_centers = []
+    for i in range(num_slices + 1):
+        x_slice = min_x + i * step
+        mask = np.abs(x_coords - x_slice) <= 2.0
+        y_slice = y_coords[mask]
+        if len(y_slice) > 0:
+            top_y = np.max(y_slice)
+            bottom_y = np.min(y_slice)
+            y_center = (top_y + bottom_y) / 2.0
+            slice_centers.append((x_slice, y_center))
+
+    if len(slice_centers) < 3:
+        raise ValueError("Недостаточно сечений для аппроксимации прямой.")
+
+    slice_centers = np.array(slice_centers)
+
+    # Аппроксимация прямой
+    A = np.vstack([slice_centers[:, 0], np.ones(len(slice_centers))]).T
+    a, b = np.linalg.lstsq(A, slice_centers[:, 1], rcond=None)[0]
+
+    # Расстояния до прямой
+    distances = np.abs(a * slice_centers[:, 0] - slice_centers[:, 1] + b) / np.sqrt(a*a + 1)
+
+    # Максимальное отклонение
+    max_idx = np.argmax(distances)
+    max_deviation_px = float(distances[max_idx])
+    max_point = tuple(slice_centers[max_idx].astype(int))
+
+    # Среднеквадратичное отклонение (RMS)
+    rms_deviation_px = float(np.sqrt(np.mean(distances ** 2)))
+
+    result = {
+        "straightness_deviation_px": max_deviation_px,
+        "straightness_deviation_mm": scale_to_mm(max_deviation_px, pixels_per_mm),
+        "straightness_rms_mm": scale_to_mm(rms_deviation_px, pixels_per_mm),
+        "max_deviation_point": max_point,
+        "line_coefficients": {"a": float(a), "b": float(b)},
+        "slice_centers": slice_centers.tolist(),
+        "neck_start_x": float(neck_start_x),
+    }
+
+    logger.debug(
+        f"Прямолинейность: S_max={result['straightness_deviation_mm']:.3f} мм, "
+        f"S_rms={result['straightness_rms_mm']:.3f} мм (исключено {neck_percentage*100}% горлышка)"
+    )
     return result
